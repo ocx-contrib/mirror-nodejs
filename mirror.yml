@@ -71,7 +71,7 @@ platforms:
     runner: windows-latest
     shell: pwsh
   windows/arm64:
-    runner: windows-latest
+    runner: windows-11-arm
     shell: pwsh
 
 notify:
