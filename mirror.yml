@@ -9,19 +9,13 @@ source:
     command: ["uv", "run", "generate.py"]
     timeout_seconds: 240
 
+# Bootstrap pass: linux only. macOS + Windows added back once linux is green
+# end-to-end (see README "Adding platforms" section once written).
 assets:
   linux/amd64:
     - "node-.*-linux-x64\\.tar\\.xz"
   linux/arm64:
     - "node-.*-linux-arm64\\.tar\\.xz"
-  darwin/amd64:
-    - "node-.*-darwin-x64\\.tar\\.gz"
-  darwin/arm64:
-    - "node-.*-darwin-arm64\\.tar\\.gz"
-  windows/amd64:
-    - "node-.*-win-x64\\.zip"
-  windows/arm64:
-    - "node-.*-win-arm64\\.zip"
 
 asset_type:
   type: archive
@@ -56,18 +50,6 @@ platforms:
     runner: ubuntu-latest
   linux/arm64:
     runner: ubuntu-24.04-arm
-  darwin/amd64:
-    runner: macos-latest
-    prefix: ["arch", "-x86_64"]
-  darwin/arm64:
-    runner: macos-latest
-    shell: bash
-  windows/amd64:
-    runner: windows-latest
-    shell: pwsh
-  windows/arm64:
-    runner: windows-latest
-    shell: pwsh
 
 notify:
   discord:
