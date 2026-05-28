@@ -117,6 +117,24 @@ jobs:
               - name: smoke
                 kind: script
                 script: tests/smoke.star
+          - platform: darwin/amd64
+            platform_slug: darwin_amd64
+            runner: macos-latest
+            container_id: _native_
+            shell: bash
+            tests:
+              - name: smoke
+                kind: script
+                script: tests/smoke.star
+          - platform: darwin/arm64
+            platform_slug: darwin_arm64
+            runner: macos-latest
+            container_id: _native_
+            shell: bash
+            tests:
+              - name: smoke
+                kind: script
+                script: tests/smoke.star
 
     runs-on: ${{ matrix.runner }}
     steps:
