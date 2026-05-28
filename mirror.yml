@@ -29,6 +29,11 @@ asset_type:
 
 metadata:
   default: metadata.json
+  platforms:
+    # Windows zips put node.exe at the archive root (no bin/ subdir), so
+    # PATH must point at installPath itself rather than installPath/bin.
+    windows/amd64: metadata-windows.json
+    windows/arm64: metadata-windows.json
 
 skip_prereleases: true
 cascade: true
