@@ -9,8 +9,6 @@ source:
     command: ["uv", "run", "generate.py"]
     timeout_seconds: 240
 
-# Platforms added back successively: linux first (green), now darwin.
-# Windows added in next iteration.
 assets:
   linux/amd64:
     - "node-.*-linux-x64\\.tar\\.xz"
@@ -20,6 +18,10 @@ assets:
     - "node-.*-darwin-x64\\.tar\\.gz"
   darwin/arm64:
     - "node-.*-darwin-arm64\\.tar\\.gz"
+  windows/amd64:
+    - "node-.*-win-x64\\.zip"
+  windows/arm64:
+    - "node-.*-win-arm64\\.zip"
 
 asset_type:
   type: archive
@@ -60,6 +62,12 @@ platforms:
   darwin/arm64:
     runner: macos-latest
     shell: bash
+  windows/amd64:
+    runner: windows-latest
+    shell: pwsh
+  windows/arm64:
+    runner: windows-latest
+    shell: pwsh
 
 notify:
   discord:
