@@ -12,9 +12,10 @@ on:
     branches: [main]
     paths:
       - mirror.yml
-      - scripts/**
+      - generate.py
       - tests/**
       - metadata*.json
+      - logo.*
       - .github/workflows/mirror.yml
 
 concurrency:
