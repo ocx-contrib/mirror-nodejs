@@ -73,19 +73,36 @@ bin_scan: off
 # leg would red on a correct artifact — and the renderer rejects an alpine leg
 # on a glibc key outright (exit 65). Both images ship libstdc++, which
 # `bin/node` also needs (DT_NEEDED libstdc++.so.6, libgcc_s.so.1).
+# node links libatomic.so.1 dynamically (24.22.2: exit 127 "error while loading
+# shared libraries" in the stock ubuntu/fedora images), so each container leg
+# provisions it via `setup:`. The consumer-side requirement is not declarable.
 platforms:
   "linux/amd64+libc.glibc":
     runner: ubuntu-latest
     containers:
-      - { image: "ubuntu:24.04", shell: bash }
-      - { image: "fedora:40",    shell: bash }
+      - image: "ubuntu:24.04"
+        shell: bash
+        setup:
+          - apt-get update
+          - apt-get install -y --no-install-recommends libatomic1
+      - image: "fedora:40"
+        shell: bash
+        setup:
+          - dnf install -y libatomic
   "linux/arm64+libc.glibc":
     # arm64 container legs run natively — no qemu — so the runner arch must
     # match the platform or the renderer's guard reds the leg up front.
     runner: ubuntu-24.04-arm
     containers:
-      - { image: "ubuntu:24.04", shell: bash }
-      - { image: "fedora:40",    shell: bash }
+      - image: "ubuntu:24.04"
+        shell: bash
+        setup:
+          - apt-get update
+          - apt-get install -y --no-install-recommends libatomic1
+      - image: "fedora:40"
+        shell: bash
+        setup:
+          - dnf install -y libatomic
   darwin/amd64:
     # Intel slice tested on the arm64 macos-14 runner via Rosetta 2 (GitHub's
     # macos-13 Intel pool is exhausted and deadlocks the push job).

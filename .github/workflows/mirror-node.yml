@@ -164,6 +164,11 @@ jobs:
             container_image: "ubuntu:24.04"
             container_libc: "gnu"
             docker_platform: "linux/amd64"
+            container_dockerfile: |
+              FROM ubuntu:24.04
+              SHELL ["bash", "-c"]
+              RUN apt-get update
+              RUN apt-get install -y --no-install-recommends libatomic1
             shell: bash
             tests:
               - name: smoke
@@ -176,6 +181,10 @@ jobs:
             container_image: "fedora:40"
             container_libc: "gnu"
             docker_platform: "linux/amd64"
+            container_dockerfile: |
+              FROM fedora:40
+              SHELL ["bash", "-c"]
+              RUN dnf install -y libatomic
             shell: bash
             tests:
               - name: smoke
@@ -188,6 +197,11 @@ jobs:
             container_image: "ubuntu:24.04"
             container_libc: "gnu"
             docker_platform: "linux/arm64"
+            container_dockerfile: |
+              FROM ubuntu:24.04
+              SHELL ["bash", "-c"]
+              RUN apt-get update
+              RUN apt-get install -y --no-install-recommends libatomic1
             shell: bash
             tests:
               - name: smoke
@@ -200,6 +214,10 @@ jobs:
             container_image: "fedora:40"
             container_libc: "gnu"
             docker_platform: "linux/arm64"
+            container_dockerfile: |
+              FROM fedora:40
+              SHELL ["bash", "-c"]
+              RUN dnf install -y libatomic
             shell: bash
             tests:
               - name: smoke
@@ -246,6 +264,7 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OCX_CONTAINER_DOCKERFILE: ${{ matrix.container_dockerfile }}
         run: |
           set -euo pipefail
           # `tr -d '\r'` strips CR injected by native jq.exe on Windows runners.
@@ -333,6 +352,15 @@ jobs:
                   OCX_PULL_ATTEMPT=$((OCX_PULL_ATTEMPT + 1))
                   OCX_PULL_DELAY=$((OCX_PULL_DELAY * 2))
                 done
+              fi
+              if [ -n "${OCX_CONTAINER_DOCKERFILE:-}" ]; then
+                OCX_SETUP_TAG="ocx-mirror-setup:${{ matrix.container_id }}-${{ matrix.platform_slug }}"
+                if ! docker image inspect "${OCX_SETUP_TAG}" >/dev/null 2>&1; then
+                  printf '%s' "${OCX_CONTAINER_DOCKERFILE}" \
+                    | docker build --platform "${{ matrix.docker_platform }}" -t "${OCX_SETUP_TAG}" - \
+                    || { echo "::error::container setup failed for ${{ matrix.container_id }} on ${{ matrix.platform }}: a setup: command exited non-zero (the failing RUN is above)"; exit 1; }
+                fi
+                CONTAINER_IMAGE="${OCX_SETUP_TAG}"
               fi
             fi
             ocx_test() {
